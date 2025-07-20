@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gahantognoli.gestao_vagas.exceptions.UserFoundException;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.CandidateEntity;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.CreateCandidateUseCase;
-import br.com.gahantognoli.gestao_vagas.modules.exceptions.UserFoundException;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/candidates")
+@RequestMapping("/candidate")
 public class CandidateController {
 
   @Autowired

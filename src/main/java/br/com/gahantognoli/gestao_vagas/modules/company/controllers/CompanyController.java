@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.gahantognoli.gestao_vagas.exceptions.UserFoundException;
 import br.com.gahantognoli.gestao_vagas.modules.company.entities.CompanyEntity;
 import br.com.gahantognoli.gestao_vagas.modules.company.usesCases.CreateCompanyUseCase;
-import br.com.gahantognoli.gestao_vagas.modules.exceptions.UserFoundException;
 import jakarta.validation.Valid;
 
 @RestController

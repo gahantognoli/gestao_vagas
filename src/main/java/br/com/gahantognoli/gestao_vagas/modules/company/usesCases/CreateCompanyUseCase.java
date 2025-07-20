@@ -3,9 +3,9 @@ package br.com.gahantognoli.gestao_vagas.modules.company.usesCases;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.gahantognoli.gestao_vagas.exceptions.UserFoundException;
 import br.com.gahantognoli.gestao_vagas.modules.company.entities.CompanyEntity;
 import br.com.gahantognoli.gestao_vagas.modules.company.repositories.CompanyRepository;
-import br.com.gahantognoli.gestao_vagas.modules.exceptions.UserFoundException;
 
 @Service
 public class CreateCompanyUseCase {

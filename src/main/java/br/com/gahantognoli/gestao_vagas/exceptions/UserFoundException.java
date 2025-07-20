@@ -1,4 +1,4 @@
-package br.com.gahantognoli.gestao_vagas.modules.exceptions;
+package br.com.gahantognoli.gestao_vagas.exceptions;
 
 public class UserFoundException extends RuntimeException {
   public UserFoundException(){

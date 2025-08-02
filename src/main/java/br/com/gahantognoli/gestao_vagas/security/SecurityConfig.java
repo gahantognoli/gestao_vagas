@@ -28,6 +28,9 @@ public class SecurityConfig {
           auth.requestMatchers("/company").permitAll();
           auth.requestMatchers("/auth/company").permitAll();
           auth.requestMatchers("/auth/candidate").permitAll();
+          auth.requestMatchers("/swagger-ui/**").permitAll();
+          auth.requestMatchers("/v3/api-docs/**").permitAll();
+          auth.requestMatchers("/swagger-resources/**").permitAll();
           auth.anyRequest().authenticated();
         })
         .addFilterBefore(securityCandidateFilter, BasicAuthenticationFilter.class)

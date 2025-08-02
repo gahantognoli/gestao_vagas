@@ -19,6 +19,13 @@ import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.CreateCandida
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.ListAllJobsByFilterUseCase;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.ProfileCandidateUseCase;
 import br.com.gahantognoli.gestao_vagas.modules.company.entities.JobEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -34,7 +41,6 @@ public class CandidateController {
 
   @Autowired
   private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
-
 
   @PostMapping
   public ResponseEntity<Object> create(@Valid @RequestBody CandidateEntity candidateEntity) {
@@ -60,6 +66,22 @@ public class CandidateController {
 
   @GetMapping("/jobs")
   @PreAuthorize("hasRole('CANDIDATE')")
+  @Tag(name = "Candidato", description = "Informações do candidato")
+  @Operation(
+    summary = "Listar vagas disponíveis para o candidato", 
+    description = "Essa função é responsável por listar todas as vagas disponíveis baseada no filtro."
+  )
+  @ApiResponses({
+    @ApiResponse(
+      responseCode = "200",
+      content = @Content(
+        array = @ArraySchema(
+          schema = @Schema(implementation = JobEntity.class)
+        )
+      ),
+      description = "Lista de vagas retornada com sucesso"
+    )
+  })
   public List<JobEntity> getJobs(@RequestParam String filter) {
     return this.listAllJobsByFilterUseCase.execute(filter);
   }

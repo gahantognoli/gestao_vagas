@@ -1,5 +1,6 @@
 package br.com.gahantognoli.gestao_vagas.modules.candidate.useCases;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -15,8 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.gahantognoli.gestao_vagas.exceptions.JobNotFoundException;
 import br.com.gahantognoli.gestao_vagas.exceptions.UserNotFoundException;
-import br.com.gahantognoli.gestao_vagas.modules.candidate.CandidateEntity;
-import br.com.gahantognoli.gestao_vagas.modules.candidate.CandidateRepository;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.entities.ApplyJobEntity;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.entities.CandidateEntity;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.repositories.ApplyJobRepository;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.repositories.CandidateRepository;
+import br.com.gahantognoli.gestao_vagas.modules.company.entities.JobEntity;
 import br.com.gahantognoli.gestao_vagas.modules.company.repositories.JobRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +34,9 @@ public class ApplyJobCandidateUseCaseTest {
 
   @Mock
   private JobRepository jobRepository;
+
+  @Mock
+  private ApplyJobRepository applyJobRepository;
   
   @Test
   @DisplayName("Should not be able to apply job with candidate not found")
@@ -53,6 +60,30 @@ public class ApplyJobCandidateUseCaseTest {
     } catch (Exception e) {
       Assertions.assertThat(e).isInstanceOf(JobNotFoundException.class);
     }
+  }
+
+  @Test
+  @DisplayName("Should not be able to create a new apply job")
+  public void shloud_be_able_to_create_a_new_apply_job(){
+      var idCandidate = UUID.randomUUID();
+      var idJob = UUID.randomUUID();
+      
+      var applyJob = ApplyJobEntity.builder()
+        .candidateId(idCandidate)
+        .jobId(idJob)
+        .build();
+
+      var applyJobCreate = ApplyJobEntity.builder()
+        .id(UUID.randomUUID())
+        .build();
+
+      when(candidateRepository.findById(idCandidate)).thenReturn(Optional.of(new CandidateEntity()));
+      when(jobRepository.findById(idJob)).thenReturn(Optional.of(new JobEntity()));
+      when(applyJobRepository.save(applyJob)).thenReturn(applyJobCreate);
+
+      var result = applyJobCandidateUseCase.execute(idCandidate, idJob);
+      Assertions.assertThat(result).hasFieldOrProperty("id"); 
+      assertNotNull(result.getId());    
   }
 
 }

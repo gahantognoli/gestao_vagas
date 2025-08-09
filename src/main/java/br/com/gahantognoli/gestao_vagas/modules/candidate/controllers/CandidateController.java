@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.gahantognoli.gestao_vagas.exceptions.UserFoundException;
-import br.com.gahantognoli.gestao_vagas.modules.candidate.CandidateEntity;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.dto.ProfileCandidateResponseDTO;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.entities.CandidateEntity;
+import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.ApplyJobCandidateUseCase;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.CreateCandidateUseCase;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.ListAllJobsByFilterUseCase;
 import br.com.gahantognoli.gestao_vagas.modules.candidate.useCases.ProfileCandidateUseCase;
@@ -45,28 +46,14 @@ public class CandidateController {
   @Autowired
   private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
 
+  @Autowired
+  private ApplyJobCandidateUseCase applyJobCandidateUseCase;
+
   @PostMapping
-  @Operation(
-    summary = "Cadastro de candidato", 
-    description = "Essa função é responsável por cadastrar um novo candidato."
-  )
+  @Operation(summary = "Cadastro de candidato", description = "Essa função é responsável por cadastrar um novo candidato.")
   @ApiResponses({
-    @ApiResponse(
-      responseCode = "200",
-      content = @Content(
-        array = @ArraySchema(
-          schema = @Schema(implementation = CandidateEntity.class)
-        )
-      ),
-      description = "Perfil do candidato retornado com sucesso"
-    ),
-    @ApiResponse(
-      responseCode = "400",
-      content = @Content(
-        schema = @Schema(type = "string", example = "Usuário já existe.")
-      ),
-      description = "Usuário já existe."
-    )
+      @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CandidateEntity.class))), description = "Perfil do candidato retornado com sucesso"),
+      @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(type = "string", example = "Usuário já existe.")), description = "Usuário já existe.")
   })
   public ResponseEntity<Object> create(@Valid @RequestBody CandidateEntity candidateEntity) {
     try {
@@ -79,27 +66,10 @@ public class CandidateController {
 
   @GetMapping
   @PreAuthorize("hasRole('CANDIDATE')")
-  @Operation(
-    summary = "Perfil do candidato", 
-    description = "Essa função é responsável por buscar as informações do perfil do candidato."
-  )
+  @Operation(summary = "Perfil do candidato", description = "Essa função é responsável por buscar as informações do perfil do candidato.")
   @ApiResponses({
-    @ApiResponse(
-      responseCode = "200",
-      content = @Content(
-        array = @ArraySchema(
-          schema = @Schema(implementation = ProfileCandidateResponseDTO.class)
-        )
-      ),
-      description = "Perfil do candidato retornado com sucesso"
-    ),
-    @ApiResponse(
-      responseCode = "400",
-      content = @Content(
-        schema = @Schema(type = "string", example = "User not found")
-      ),
-      description = "User not found"
-    )
+      @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))), description = "Perfil do candidato retornado com sucesso"),
+      @ApiResponse(responseCode = "400", content = @Content(schema = @Schema(type = "string", example = "User not found")), description = "User not found")
   })
   @SecurityRequirement(name = "jwt_auth")
   public ResponseEntity<Object> getProfile(HttpServletRequest request) {
@@ -114,23 +84,26 @@ public class CandidateController {
 
   @GetMapping("/jobs")
   @PreAuthorize("hasRole('CANDIDATE')")
-  @Operation(
-    summary = "Listar vagas disponíveis para o candidato", 
-    description = "Essa função é responsável por listar todas as vagas disponíveis baseada no filtro."
-  )
+  @Operation(summary = "Listar vagas disponíveis para o candidato", description = "Essa função é responsável por listar todas as vagas disponíveis baseada no filtro.")
   @ApiResponses({
-    @ApiResponse(
-      responseCode = "200",
-      content = @Content(
-        array = @ArraySchema(
-          schema = @Schema(implementation = JobEntity.class)
-        )
-      ),
-      description = "Lista de vagas retornada com sucesso"
-    )
+      @ApiResponse(responseCode = "200", content = @Content(array = @ArraySchema(schema = @Schema(implementation = JobEntity.class))), description = "Lista de vagas retornada com sucesso")
   })
   @SecurityRequirement(name = "jwt_auth")
   public List<JobEntity> getJobs(@RequestParam String filter) {
     return this.listAllJobsByFilterUseCase.execute(filter);
+  }
+
+  @PostMapping("/job/apply")
+  @PreAuthorize("hasRole('CANDIDATE')")
+  @Operation(summary = "Candidatar-se a uma vaga", description = "Essa função é responsável por cadastrar a candidatura do candidato a uma vaga.")
+  @SecurityRequirement(name = "jwt_auth")
+  public ResponseEntity<Object> applyJob(HttpServletRequest request, @RequestBody UUID idJob) {
+    try {
+      var idCandidate = request.getAttribute("candidate_id");
+      var result = this.applyJobCandidateUseCase.execute(UUID.fromString(idCandidate.toString()), idJob);
+      return ResponseEntity.ok().body(result);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
 }

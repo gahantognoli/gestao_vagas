@@ -33,31 +33,26 @@ public class JobController {
   @PostMapping
   @PreAuthorize("hasRole('COMPANY')")
   @Tag(name = "Vagas", description = "Informações da vaga")
-  @Operation(
-    summary = "Cadastro de vagas", 
-    description = "Essa função é responsável por cadastrar as vagas dentro da empresa."
-  )
+  @Operation(summary = "Cadastro de vagas", description = "Essa função é responsável por cadastrar as vagas dentro da empresa.")
   @ApiResponses({
-    @ApiResponse(
-      responseCode = "200",
-      content = @Content(
-        schema = @Schema(implementation = JobEntity.class)
-      ),
-      description = "Lista de vagas retornada com sucesso"
-    )
+      @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = JobEntity.class)), description = "Lista de vagas retornada com sucesso")
   })
   @SecurityRequirement(name = "jwt_auth")
   public ResponseEntity<Object> create(@Valid @RequestBody CreateJobDTO createJobDTO, HttpServletRequest request) {
-    var companyId = request.getAttribute("company_id");
+    try {
+      var companyId = request.getAttribute("company_id");
 
-    var jobEntity = JobEntity.builder()
-      .benefits(createJobDTO.getBenefits())
-      .description(createJobDTO.getDescription())
-      .level(createJobDTO.getLevel())
-      .companyId(UUID.fromString(companyId.toString()))
-      .build();
+      var jobEntity = JobEntity.builder()
+          .benefits(createJobDTO.getBenefits())
+          .description(createJobDTO.getDescription())
+          .level(createJobDTO.getLevel())
+          .companyId(UUID.fromString(companyId.toString()))
+          .build();
 
-    var result = this.createJobUseCase.execute(jobEntity);
-    return ResponseEntity.ok().body(result);
+      var result = this.createJobUseCase.execute(jobEntity);
+      return ResponseEntity.ok().body(result);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
 }

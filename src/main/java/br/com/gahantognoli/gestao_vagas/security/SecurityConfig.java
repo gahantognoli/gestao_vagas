@@ -31,6 +31,7 @@ public class SecurityConfig {
           auth.requestMatchers("/swagger-ui/**").permitAll();
           auth.requestMatchers("/v3/api-docs/**").permitAll();
           auth.requestMatchers("/swagger-resources/**").permitAll();
+          auth.requestMatchers("/actuator/**").permitAll();
           auth.anyRequest().authenticated();
         })
         .addFilterBefore(securityCandidateFilter, BasicAuthenticationFilter.class)

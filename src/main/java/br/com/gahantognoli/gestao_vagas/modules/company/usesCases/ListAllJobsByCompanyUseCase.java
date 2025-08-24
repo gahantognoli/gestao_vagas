@@ -1,4 +1,4 @@
-﻿package br.com.gahantognoli.gestao_vagas.modules.company.usesCases;
+package br.com.gahantognoli.gestao_vagas.modules.company.usesCases;
 
 import br.com.gahantognoli.gestao_vagas.modules.company.entities.JobEntity;
 import br.com.gahantognoli.gestao_vagas.modules.company.repositories.JobRepository;
